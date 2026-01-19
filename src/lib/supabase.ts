@@ -3,7 +3,8 @@ import type { LeaderboardEntry } from '../types';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-let supabase: ReturnType<typeof import('@supabase/supabase-js').createClient> | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let supabase: any = null;
 
 async function getSupabaseClient() {
   if (!supabaseUrl || !supabaseAnonKey) {
@@ -28,9 +29,10 @@ export async function submitScore(
     return saveToLocalStorage(playerName, score, lines, level);
   }
 
-  const { data, error } = await client
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (client
     .from('scores')
-    .insert([{ player_name: playerName, score, lines, level }])
+    .insert([{ player_name: playerName, score, lines, level }]) as any)
     .select()
     .single();
 
@@ -49,11 +51,12 @@ export async function getLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
     return getFromLocalStorage();
   }
 
-  const { data, error } = await client
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (client
     .from('scores')
     .select('*')
     .order('score', { ascending: false })
-    .limit(limit);
+    .limit(limit) as any);
 
   if (error) {
     console.error('Error fetching leaderboard:', error);
